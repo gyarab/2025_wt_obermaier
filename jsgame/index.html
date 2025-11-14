@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JavaScript Game</title>
+</head>
+<body>
+    <h1>JSgame</h1>
+    <p>Guess a number between 1 and 100!</p>
+    <input type="button" value="New Game" id="newGameBtn" onclick="newGame()">
+    <br>
+    <input type="number" name="guess" id="guess" min="1">
+    <input type="button" value="Submit Guess" id="submitGuessBtn">
+    <p> 
+        Number of atempts: <span id="attempts">0</span>
+    </p>
+
+    <script>
+        let secretNumber;
+        let attempts;
+        function newGame() {
+            secretNumber = Math.floor(Math.random() * 100) + 1;
+            attempts = 0;
+            console.log("--- New Game Started ---");
+            console.log("Secret Number:", secretNumber);
+        }
+        function submitGuess() {
+            attempts++;
+            const guessInput = document.getElementById('guess');
+            const guess = Number(guessInput.value);
+            document.getElementById('attempts').innerText = attempts;
+
+            if (guess === secretNumber) {
+                alert(`Congratulations! You've guessed the number ${secretNumber} in ${attempts} attempts.`);
+            } else if (guess < secretNumber) {
+                alert("Too low!");
+            } else {
+                alert("Too high!");
+            }
+        }
+
+        document.getElementById('newGameBtn').addEventListener('click', newGame);
+        document.getElementById("submitGuessBtn").addEventListener('click', submitGuess);
+        document.getElementById("submitGuessBtn").addEventListener('keydown', function(e) {
+            if (event.key === 'Enter') {
+                submitGuess();
+            }
+        });
+
+        newGame();
+    </script>
+
+</body>
+</html>
