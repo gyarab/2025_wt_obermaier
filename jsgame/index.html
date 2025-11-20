@@ -4,52 +4,237 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>JavaScript Game</title>
+
+    <style>
+        #messageBox {
+            margin-top: 15px;
+            padding: 10px;
+            font-size: 18px;
+            font-weight: bold;
+            width: 300px;
+            border-radius: 5px;
+            transition: 0.2s;
+        }
+
+        #guess {
+            width: 200px;
+            font-size: 18px;
+            padding: 5px;
+        }
+
+        @keyframes shake {
+            0% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            50% { transform: translateX(5px); }
+            75% { transform: translateX(-5px); }
+            100% { transform: translateX(0); }
+        }
+
+        .shake {
+            animation: shake 0.3s;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        .pulse {
+            animation: pulse 0.7s ease-out;
+        }
+
+        .controls-row {
+            margin-bottom: 10px;
+        }
+
+        #logBox {
+            margin-top: 20px;
+            border: 1px solid #aaa;
+            padding: 10px;
+            width: 300px;
+            height: 180px;
+            overflow-y: auto;
+            font-size: 14px;
+            background: #f7f7f7;
+        }
+
+        #dangerInfo {
+            margin-top: 15px;
+            background: yellow;
+            padding: 8px;
+            width: 300px;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+    </style>
 </head>
 <body>
     <h1>JSgame</h1>
-    <p>Guess a number between 1 and 100!</p>
-    <input type="button" value="New Game" id="newGameBtn" onclick="newGame()">
-    <br>
-    <input type="number" name="guess" id="guess" min="1">
-    <input type="button" value="Submit Guess" id="submitGuessBtn">
-    <p> 
-        Number of atempts: <span id="attempts">0</span>
+
+    <p>
+        Guess a number between <span id="rangeMin">1</span> and 
+        <span id="rangeMax">100</span>!
     </p>
 
+    <div class="controls-row">
+        <input type="button" value="New Game" id="newGameBtn">
+
+        <label for="difficulty">Difficulty:</label>
+        <select id="difficulty">
+            <option value="easy" selected>Easy (1–100)</option>
+            <option value="medium">Medium (1–1000)</option>
+            <option value="hard">Hard (1–10000)</option>
+            <option value="luck">Luck (1–1000000)</option>
+        </select>
+    </div>
+
+    <input type="number" name="guess" id="guess" min="1">
+    <input type="button" value="Submit Guess" id="submitGuessBtn">
+
+    <p>Attempts: <span id="attempts">0</span></p>
+    <p>Time: <span id="timer">0.0</span> s</p>
+
+    <div id="messageBox"></div>
+
+    <div id="dangerInfo"></div>
+
+    <div id="logBox"></div>
+
     <script>
-        let secretNumber;
+        let winningNumber;
+        let losingNumber;
         let attempts;
-        function newGame() {
-            secretNumber = Math.floor(Math.random() * 100) + 1;
-            attempts = 0;
-            console.log("--- New Game Started ---");
-            console.log("Secret Number:", secretNumber);
+        let maxNumber = 100;
+        let timerInterval;
+        let startTime;
+
+        function startTimer() {
+            startTime = Date.now();
+            clearInterval(timerInterval);
+            timerInterval = setInterval(() => {
+                let elapsed = (Date.now() - startTime) / 1000;
+                document.getElementById("timer").innerText = elapsed.toFixed(1);
+            }, 100);
         }
-        function submitGuess() {
-            attempts++;
+
+        function stopTimer() {
+            clearInterval(timerInterval);
+        }
+
+        function setRangeDisplay() {
+            document.getElementById('rangeMin').innerText = 1;
+            document.getElementById('rangeMax').innerText = maxNumber;
             const guessInput = document.getElementById('guess');
-            const guess = Number(guessInput.value);
+            guessInput.min = 1;
+            guessInput.max = maxNumber;
+            guessInput.value = "";
+        }
+
+        function newGame() {
+            attempts = 0;
             document.getElementById('attempts').innerText = attempts;
 
-            if (guess === secretNumber) {
-                alert(`Congratulations! You've guessed the number ${secretNumber} in ${attempts} attempts.`);
-            } else if (guess < secretNumber) {
-                alert("Too low!");
-            } else {
-                alert("Too high!");
+            winningNumber = Math.floor(Math.random() * maxNumber) + 1;
+
+            do {
+                losingNumber = Math.floor(Math.random() * maxNumber) + 1;
+            } while (losingNumber === winningNumber);
+
+            startTimer();
+
+            let box = document.getElementById("messageBox");
+            box.innerText = "New game started!";
+            box.style.backgroundColor = "#ddd";
+            box.style.color = "black";
+
+            document.getElementById("dangerInfo").innerText =
+                "⚠️ One number in this range is DEADLY. Guess carefully.";
+
+            document.getElementById("logBox").innerHTML = "";
+
+            console.log("WIN NUMBER:", winningNumber, "LOSE NUMBER:", losingNumber);
+        }
+
+        function addToLog(text) {
+            const log = document.getElementById("logBox");
+            log.innerHTML += text + "<br>";
+            log.scrollTop = log.scrollHeight;
+        }
+
+        function submitGuess() {
+            const guessInput = document.getElementById('guess');
+            const guess = Number(guessInput.value);
+
+            if (!guess) return;
+
+            attempts++;
+            document.getElementById('attempts').innerText = attempts;
+
+            const box = document.getElementById("messageBox");
+
+            if (guess === losingNumber) {
+                stopTimer();
+                box.innerText = `💀 You hit the deadly number ${losingNumber}! Game Over!`;
+                box.style.backgroundColor = "black";
+                box.style.color = "red";
+                box.classList.add("shake");
+
+                addToLog(`${guess} → ☠️ DEADLY NUMBER`);
+                return;
             }
+
+            if (guess === winningNumber) {
+                stopTimer();
+                box.innerText = `🎉 Correct! ${winningNumber} was the number!`;
+                box.style.backgroundColor = "green";
+                box.style.color = "white";
+                box.classList.add("pulse");
+
+                addToLog(`${guess} → ✔️ Correct`);
+                return;
+            }
+
+            if (guess < winningNumber) {
+                box.innerText = "Too low!";
+                box.style.backgroundColor = "red";
+                box.style.color = "white";
+                box.classList.add("shake");
+
+                addToLog(`${guess} → too low`);
+            } else {
+                box.innerText = "Too high!";
+                box.style.backgroundColor = "yellow";
+                box.style.color = "black";
+                box.classList.add("shake");
+
+                addToLog(`${guess} → too high`);
+            }
+
+            setTimeout(() => box.classList.remove("shake"), 300);
+        }
+
+        function updateDifficulty() {
+            const difficulty = document.getElementById('difficulty').value;
+
+            if (difficulty === 'easy') maxNumber = 100;
+            else if (difficulty === 'medium') maxNumber = 1000;
+            else if (difficulty === 'hard') maxNumber = 10000;
+            else if (difficulty === 'luck') maxNumber = 1000000;
+
+            setRangeDisplay();
+            newGame();
         }
 
         document.getElementById('newGameBtn').addEventListener('click', newGame);
         document.getElementById("submitGuessBtn").addEventListener('click', submitGuess);
-        document.getElementById("submitGuessBtn").addEventListener('keydown', function(e) {
-            if (event.key === 'Enter') {
-                submitGuess();
-            }
+        document.getElementById("guess").addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') submitGuess();
         });
+        document.getElementById('difficulty').addEventListener('change', updateDifficulty);
 
+        setRangeDisplay();
         newGame();
     </script>
-
 </body>
 </html>
