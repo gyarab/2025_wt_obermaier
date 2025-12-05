@@ -5,40 +5,49 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>VUEJS</title>
+    <link rel="icon" href="./favicon.ico">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
 </head>
 
 <body>
-    <div class="container text-center">
-        <h1>VueJS</h1>
-        <a href="https://vuejs.org/guide/introduction.html" target="_blank">Dokumentace VueJS</a>
+    <div class="container text-center pt-5" style="max-width: 600px; padding-bottom: 400px;">
+        <h1 class="my-3">VueJS</h1>
+        <p>
+            <a href="https://vuejs.org/guide/introduction.html" target="_blank">Dokumentace VueJS</a>
+        </p>
         <div id="app">
-            <div class="crad">
+            <div class="card p-3">
                 <form>
-                    <div>
-                    <input type="text" id="name" name="name">
+                    <div class="mb-3">
+                        <label class="mr-3">Your name:</label>
+                        <input type="text" id="planet" name="name">
                     </div>
-                    <div>
-                    <select name="planet">
-                        <option value="mercury">Mercury</option>
-                        <option value="venus">Venus</option>
-                        <option value="earth">Earth</option>
-                        <option value="mars">Mars</option>
-                        <option value="jupiter">Jupiter</option>
-                        <option value="saturn">Saturn</option>
-                        <option value="uranus">Uranus</option>
-                        <option value="neptune">Neptune</option>
-                    </select>
+                    <div class="mb-3">
+                        <label for="planet">Select your planet:</label>
+                        <select name="planet" class="form-select">
+                            <option value="mercury">Mercury</option>
+                            <option value="venus">Venus</option>
+                            <option value="earth">Earth</option>
+                            <option value="mars">Mars</option>
+                            <option value="jupiter">Jupiter</option>
+                            <option value="saturn">Saturn</option>
+                            <option value="uranus">Uranus</option>
+                            <option value="neptune">Neptune</option>
+                        </select>
                     </div>
-                    <div>
-                    <input type="number" id="days" name="days">
+                    <div class="mb-3">
+                        <label for="days">Days to stay:</label>
+                        <input class="form-control" type="number" id="days" name="days">
                     </div>
-                    <div>
-                    <input type="checkbox" id="termms">
-                    <label for="terms">I accept terms and conditions</label>
+                    <div class="mb-3">
+                        <input type="checkbox" id="termms">
+                        <label for="terms">I accept terms and conditions</label>
                     </div>
                     <button class="btn btn-primary" :disabled="!isValid" type="submit">Send</button>
+                    <p class="text-muted">
+                        Tento formulář se nikam neposílá.
+                    </p>
                 </form>
 
             </div>
@@ -55,7 +64,13 @@
             data() {
                 return {
                     message: 'Hello World!',
-                    count: 0
+                    count: 0,
+                    trip: {
+                        name: '',
+                        planet: 'earth',
+                        days: 1,
+                        termsAccepted: false
+                    }
                 }
             },
             computed: {
