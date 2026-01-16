@@ -1,45 +1,35 @@
+import random
 from turtle import forward,left,right,exitonclick
 from math import sqrt
 
-global a
-global b
-a=int(input("how big is the house? : "))
-
 def turn():
-    b=30
-    right(b)
-def domecek():
-    forward(a)
+    right(30)
+
+def domecek(size):
+    diagonal = sqrt(2 * size**2)
+    forward(size)
     left(135)
-    forward(sqrt(2*a**2))
+    forward(diagonal)
     right(135)
-    forward(a)
+    forward(size)
     right(135)
-    forward(sqrt(2*a**2))
+    forward(diagonal)
     right(135)
-    forward(a)
+    forward(size)
     right(45)
-    forward((sqrt(2*a**2))/2)
+    forward(diagonal / 2)
     right(90)
-    forward((sqrt(2*a**2))/2)
+    forward(diagonal / 2)
     right(45)
-    forward(a)
+    forward(size)
     left(90)
+
 def final():
-    domecek()
+    size = random.randint(1,200)
+    domecek(size)
     turn()
 
-final()
-final()
-final()
-final()
-final()
-final()
-final()
-final()
-final()
-final()
-final()
-final()
+for i in range(12):
+    final()
 
 exitonclick()
